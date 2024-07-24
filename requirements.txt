@@ -8,3 +8,4 @@ dash-ag-grid
 djangorestframework
 django_plotly_dash
 dj-database-url
+whitenoise
