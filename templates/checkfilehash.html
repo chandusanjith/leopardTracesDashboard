@@ -1,0 +1,163 @@
+{% extends  'Main.html' %}
+{% block content %}
+
+<style>
+  @import url(https://fonts.googleapis.com/css?family=Roboto);
+  span.s1 {
+  text-align: center;
+  font-size: 5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #FF0000;
+}
+.footer {
+   position: fixed;
+   bottom: 0;
+   width: 100%;
+   padding: 1rem 0;
+   background-color: white;
+   color: grey;
+   font-size: small;
+   text-align: center;
+}
+span.s2 {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: black	;
+}
+  :root {
+  background: #f5f6fa;
+  color: #9c9c9c;
+  font: 1rem "PT Sans", sans-serif;
+}
+
+html,
+body,
+.container {
+  height: 20%;
+}
+
+a {
+  color: inherit;
+}
+a:hover {
+  color: #7f8ff4;
+}
+
+.container {
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+          flex-direction: column;
+  -webkit-box-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+          justify-content: center;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.btn {
+  display: inline-block;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  -webkit-transition: all 200ms ease-in;
+  transition: all 200ms ease-in;
+  cursor: pointer;
+}
+.btn--primary {
+  background: #7f8ff4;
+  color: #fff;
+  box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  padding: 12px 36px;
+}
+.btn--primary:hover {
+  background: #6c7ff2;
+}
+.btn--primary:active {
+  background: #7f8ff4;
+  box-shadow: inset 0 0 10px 2px rgba(0, 0, 0, 0.2);
+}
+.btn--inside {
+  margin-left: -96px;
+}
+
+.form__field {
+  width: 500px;
+  background: #fff;
+  color: #a3a3a3;
+  font: inherit;
+  box-shadow: 0 20px 18px 0 rgba(0, 0, 0, 0.1);
+  border: 0;
+  outline: 0;
+  padding: 22px 18px;
+}
+
+</style>
+<script>
+    function show() {
+      document.getElementById('id1').style.display = "block";
+      document.getElementById('id2').style.display = "block";
+    }
+  </script>
+
+<div class="mt-2">
+      {% if messages %} {% for message in messages %}
+      <div
+        class="alert alert-{{ message.tags }} alert-dismissible fade show"
+        role="alert"
+      >
+      {{ message }}
+
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+    {% endfor %} 
+    {% endif %} 
+<center> Single file hash checking screen </center>
+<form action = "/loadfilehash/" method = "POST"> {% csrf_token %}
+<div class="container">
+	<div class="container__item">
+			<input type="text" class="form__field" placeholder="File Hash goes here" name = "singlehash" >
+			<button type="submit" onclick = "show()" class="btn btn--primary btn--inside uppercase">Check</button>
+		</form>
+    <div id="id1" class="spinner-border" style="display:none" alt=""></div>
+              <div id="id2"  style="display:none" alt="">Processing, wait for a minute or so...</div>
+	</div>
+</div>
+<div class="container">
+{% if hashed is not none %}
+<h1> Displaying Result for : {{hashed}} </h1>
+<span class="s2">Family: {{family}}</span>
+<br></br>
+<span class="s2">Type: {{type}}</span>
+<br></br>
+<span class="s2">Risk: {{risk}}</span>
+{% endif %}
+</div>
+<div class="footer">
+  <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright &copy; ParameterLabs 2020</span>
+          </div>
+        </div>
+</div>
+{% endblock %}
