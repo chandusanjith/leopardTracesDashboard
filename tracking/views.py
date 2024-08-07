@@ -21,11 +21,18 @@ def device_health_check(request):
     serializer = DeviceHealthCheckSerializer(data=request.data)
     if serializer.is_valid():
         device_id = serializer.validated_data['device_id']
-        created_at = serializer.validated_data['created_at']
-
+        created_at = serializer.validated_data['last_active_on']
+        cpu_usage = serializer.validated_data['cpu_usage']
+        memory_usage = serializer.validated_data['memory_usage']
+        disk_usage = serializer.validated_data['disk_usage']
+        temperature = serializer.validated_data['temperature']
         try:
             device = Device.objects.get(device_id=device_id)
             device.last_active_on = created_at
+            device.cpu_usage = cpu_usage
+            device.memory_usage = memory_usage
+            device.disk_usage = disk_usage
+            device.temperature = temperature
             device.save()
             return Response({'status': 'success', 'message': 'Device health check updated.'}, status=status.HTTP_200_OK)
         except Device.DoesNotExist:
