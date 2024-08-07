@@ -22,4 +22,6 @@ urlpatterns = [
     path('django_plotly_dash/', include('django_plotly_dash.urls')),
     path("traces/", include("traces.urls")),
     path("tracking/", include("tracking.urls")),
+    path('', include("traces.urls"))
+
 ]
