@@ -15,6 +15,8 @@ def LoadPage(request):
 
     # Create a DataFrame from the list of dictionaries
     leopard_df = pd.DataFrame(data)
+    if leopard_df.empty:
+        return render(request, 'Main.html')
     leopard_df['lat'] = leopard_df['lat'].astype(float)
     leopard_df['long'] = leopard_df['long'].astype(float)
 
@@ -23,6 +25,8 @@ def LoadPage(request):
 
     # Create a DataFrame from the list of dictionaries
     device_df = pd.DataFrame(data)
+    if device_df.empty:
+        return render(request, 'Main.html')
     # Define the current time
     now = datetime.now(timezone.utc)
 
@@ -36,7 +40,7 @@ def LoadPage(request):
     context = {}
 
 
-    fig = px.scatter_mapbox(leopard_df, lat="lat", lon="long", hover_name="place", hover_data=["description", "place"],
+    fig = px.scatter_mapbox(leopard_df, lat="lat", lon="long", hover_name="area_code", hover_data=["type", "area_code", "confidence"],
                             color_discrete_sequence=["fuchsia"], zoom=3, height=600)
     fig.update_layout(mapbox_style="open-street-map")
     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
@@ -76,7 +80,7 @@ def LoadPage(request):
     context['leopard_traces'] = leopard_traces
     context['leopard_traces_count'] = leopard_traces.count()
     context['devices_count'] = device_df.shape[0]
-    context['regions_monitored'] = len(list(set(leopard_df['place'].to_list())))
+    context['regions_monitored'] = len(list(set(leopard_df['area_code'].to_list())))
 
 
     return render(request, 'Main.html', context)
