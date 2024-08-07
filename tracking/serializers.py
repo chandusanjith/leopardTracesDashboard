@@ -9,7 +9,11 @@ class DeviceSerializer(serializers.ModelSerializer):
 
 class DeviceHealthCheckSerializer(serializers.Serializer):
     device_id = serializers.CharField(max_length=100)
-    created_at = serializers.DateTimeField()
+    last_active_on = serializers.DateTimeField()
+    cpu_usage = serializers.CharField(max_length=100)
+    memory_usage = serializers.CharField(max_length=100)
+    disk_usage = serializers.CharField(max_length=100)
+    temperature = serializers.CharField(max_length=100)
 
 class LeopardTracesSerializer(serializers.ModelSerializer):
     class Meta:
