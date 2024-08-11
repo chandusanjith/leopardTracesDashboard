@@ -96,7 +96,7 @@
         <div class="card card-chart" style="height: 450px;"> <!-- Adjust height accordingly -->
             <div class="card-body">
                 <div> <!-- Map fills the card -->
-                    <div id="regions_div" style="height: 420px;"></div>
+                    <div id="regions_div" style="height: 450px;">{{graph|safe}}</div>
                 </div>
             </div>
             <div class="card-footer">
@@ -109,57 +109,11 @@
 
 
 <div class="row">
-            <div class="col-md-12">
-              <div class="card">
-                <div class="card-header card-header-primary" style="background-color: rgba(255, 255, 255, 0.3) !important; color: #000;">
-                  <h4 class="card-title ">Leopard Traces</h4>
-                  <p class="card-category">Details of Leopard Traces which were notified</p>
-                </div>
-                <div class="card-body">
-                  <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="table table-hover">
-                      <thead class="">
-                        <th>
-                          Device Name
-                        </th>
-                        <th>
-                          CPU Usage
-                        </th>
-                        <th>
-                          Memory Usage
-                        </th>
-                        <th>
-                          Disk Usage
-                        </th>
-                        <th>
-                          Temperature
-                        </th>
-                       <th>
-                          Last Update Received On
-                        </th>
-                      </thead>
-                      <tbody>
-                      {% for device in devices %}
-                        <tr>
-                          <td>{{ device.device_name }}</td>
-                          <td>{{ device.cpu_usage }}</td>
-                          <td>{{ device.memory_usage }}</td>
-                          <td>{{ device.disk_usage }}</td>
-                          <td>{{ device.temperature }}</td>
-                          <td>{{ device.last_active_on }}</td>
-                        </tr>
-                      {% endfor %}
-                      </tbody>
-                    </table>
-                </div>
-
-            </div>
 <div class="col-md-12">
   <div class="card card-plain">
     <div class="card-header card-header-primary">
-      <h4 class="card-title mt-0">Device Information</h4>
-      <p class="card-category">Device Healthcheck Information</p>
+      <h4 class="card-title mt-0">Leopard Traces</h4>
+      <p class="card-category">Details of Leopard Traces which were notified</p>
     </div>
     <div class="card-body">
       <div class="table-responsive">
@@ -229,6 +183,52 @@
       </nav>
     </div>
   </div>
+    <div class="col-md-12">
+              <div class="card">
+                <div class="card-header card-header-primary" style="background-color: rgba(255, 255, 255, 0.3) !important; color: #000;">
+                  <h4 class="card-title ">Device Information</h4>
+                  <p class="card-category">Device Healthcheck Information</p>
+                </div>
+                <div class="card-body">
+                  <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead class="">
+                        <th>
+                          Device Name
+                        </th>
+                        <th>
+                          CPU Usage
+                        </th>
+                        <th>
+                          Memory Usage
+                        </th>
+                        <th>
+                          Disk Usage
+                        </th>
+                        <th>
+                          Temperature
+                        </th>
+                       <th>
+                          Last Update Received On
+                        </th>
+                      </thead>
+                      <tbody>
+                      {% for device in devices %}
+                        <tr>
+                          <td>{{ device.device_name }}</td>
+                          <td>{{ device.cpu_usage }}</td>
+                          <td>{{ device.memory_usage }}</td>
+                          <td>{{ device.disk_usage }}</td>
+                          <td>{{ device.temperature }}</td>
+                          <td>{{ device.last_active_on }}</td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                </div>
+
+            </div>
 </div>
 
 {% endblock content %}
@@ -243,34 +243,6 @@
 
     });
   </script>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {
-        'packages':['geochart'],
-      });
-      google.charts.setOnLoadCallback(drawRegionsMap);
-
-      function drawRegionsMap() {
-        var data = google.visualization.arrayToDataTable([
-          ['Lat', 'Long', 'Area Code'],
-          {% for leopard in leopards %}
-            [{{ leopard.lat }}, {{ leopard.long }}, '{{ leopard.area_code }}'],
-          {% endfor %}
-        ]);
-
-        var options = {
-          region: 'IN',  // ISO code for India
-          displayMode: 'markers',
-          resolution: 'provinces',  // Zoom into country level
-          colorAxis: {colors: ['red', 'red']},  // Example color gradient
-<!--          datalessRegionColor: '#43a047',-->
-        };
-
-        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
-
-        chart.draw(data, options);
-      }
-    </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
