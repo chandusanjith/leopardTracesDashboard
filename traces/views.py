@@ -3,22 +3,25 @@ from .models import LeopardTraces, Device
 import pandas as pd
 import plotly.express as px
 import plotly.offline as opy
-from dash import dash_table
-from django_plotly_dash import DjangoDash
-import dash_html_components as html
 from datetime import datetime, timedelta, timezone
+from django.core.paginator import Paginator
 
 # Create your views here.
 def LoadPage(request):
     leopard_traces = LeopardTraces.objects.all()
     data = list(leopard_traces.values())
+    context = {}
+
+    # Paginate the leopard traces
+    paginator = Paginator(leopard_traces, 10)  # Show 10 records per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context['leopards'] = page_obj
 
     # Create a DataFrame from the list of dictionaries
     leopard_df = pd.DataFrame(data)
-    if leopard_df.empty:
-        return render(request, 'Main.html')
-    leopard_df['lat'] = leopard_df['lat'].astype(float)
-    leopard_df['long'] = leopard_df['long'].astype(float)
+    leopard_df = leopard_df.groupby(['type', 'area_code']).size().reset_index(name='occurrence_count')
+    context['leopard_df_json'] = leopard_df.to_json(orient='records')
 
     device_traces = Device.objects.all()
     data = list(device_traces.values())
@@ -37,50 +40,11 @@ def LoadPage(request):
     # Add the device_status column
     device_df["device_status"] = device_df["last_active_on"].apply(lambda x: "active" if now - x < threshold else "not active")
 
-    context = {}
-
-
-    fig = px.scatter_mapbox(leopard_df, lat="lat", lon="long", hover_name="area_code", hover_data=["type", "area_code", "confidence"],
-                            color_discrete_sequence=["fuchsia"], zoom=3, height=600)
-    fig.update_layout(mapbox_style="open-street-map")
-    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
-    div = opy.plot(fig, auto_open=False, output_type='div')
-
-    context['graph'] = div
-
-    app = DjangoDash('SimpleExample')
-
-    app.layout = html.Div([
-        html.Div([
-            dash_table.DataTable(
-                id='table1',
-                columns=[{"name": i, "id": i} for i in leopard_df.columns],
-                data=leopard_df.to_dict('records'),
-                filter_action='native',
-                sort_action='native',
-                sort_mode='multi',
-                page_size=20,
-                style_table={'overflowY': 'auto'},
-            )
-        ]),
-        html.Br(),  # Add a break between tables for spacing
-        html.Div([
-            dash_table.DataTable(
-                id='table2',
-                columns=[{"name": i, "id": i} for i in device_df.columns],
-                data=device_df.to_dict('records'),
-                filter_action='native',
-                sort_action='native',
-                sort_mode='multi',
-                page_size=20,
-                style_table={'overflowY': 'auto'},
-            )
-        ])
-    ])
     context['leopard_traces'] = leopard_traces
     context['leopard_traces_count'] = leopard_traces.count()
     context['devices_count'] = device_df.shape[0]
     context['regions_monitored'] = len(list(set(leopard_df['area_code'].to_list())))
+    context['devices'] = data
 
 
-    return render(request, 'Main.html', context)
+    return render(request, 'home/index.html', context)
