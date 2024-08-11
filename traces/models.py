@@ -20,6 +20,7 @@ class LeopardTraces(models.Model):
     confidence = models.TextField(default="n/a")
     device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='leopard_traces', null=True, blank=True)
     traced_on = models.DateTimeField()
+    viewed = models.BooleanField(default=False)
 
     def __str__(self):
-        return "{}-{}".format(self.lat, self.place)
+        return "{}-{}".format(self.lat, self.area_code)
