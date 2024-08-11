@@ -1,0 +1,343 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+<style>
+        /* Style for the chart container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 700px;
+            background-color: #4CAF50; /* Green background similar to Material Design */
+            padding: 20px;
+            border-radius: 8px;
+        }
+    </style>
+
+
+    <div class="row">
+      <div class="col-lg-4 col-md-6 col-sm-6">
+        <div class="card card-stats  card-icon">
+          <div class="card-header card-header-success card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">pets</i>
+            </div>
+            <p class="card-category">Number Of Leopard's Detected</p>
+            <h3 class="card-title">{{leopard_traces_count}}</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">update</i> Just Updated
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-header card-header-danger card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">location_on</i>
+            </div>
+            <p class="card-category">Number of Regions Monitored</p>
+            <h3 class="card-title">{{regions_monitored}}</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">update</i> Just Updated
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 col-sm-6">
+        <div class="card card-stats">
+          <div class="card-header card-header-info card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">phonelink_ring</i>
+            </div>
+            <p class="card-category">Number of Devices Added</p>
+            <h3 class="card-title">{{devices_count}}</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">update</i> Just Updated
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<div class="row">
+    <!-- Card 1 -->
+    <div class="col-md-6">
+        <div class="card card-chart" style="height: 450px;"> <!-- Increased heightgggggggggggggg -->
+            <div class="card-header card-header-success" style="height: 350px;">
+                <canvas id="lineChart" style="width: 100% !important;"></canvas>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">Detection based on Area Codes</h4>
+                <p class="card-category">
+<!--                    <span class="text-success"><i class="fa fa-long-arrow-up"></i> 55% </span> increase in today sales.</p>-->
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    <i class="material-icons">access_time</i> updated just now
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map inside a card -->
+    <div class="col-md-6">
+        <div class="card card-chart" style="height: 450px;"> <!-- Adjust height accordingly -->
+            <div class="card-body">
+                <div> <!-- Map fills the card -->
+                    <div id="regions_div" style="height: 420px;"></div>
+                </div>
+            </div>
+            <div class="card-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header card-header-primary" style="background-color: rgba(255, 255, 255, 0.3) !important; color: #000;">
+                  <h4 class="card-title ">Leopard Traces</h4>
+                  <p class="card-category">Details of Leopard Traces which were notified</p>
+                </div>
+                <div class="card-body">
+                  <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead class="">
+                        <th>
+                          Device Name
+                        </th>
+                        <th>
+                          CPU Usage
+                        </th>
+                        <th>
+                          Memory Usage
+                        </th>
+                        <th>
+                          Disk Usage
+                        </th>
+                        <th>
+                          Temperature
+                        </th>
+                       <th>
+                          Last Update Received On
+                        </th>
+                      </thead>
+                      <tbody>
+                      {% for device in devices %}
+                        <tr>
+                          <td>{{ device.device_name }}</td>
+                          <td>{{ device.cpu_usage }}</td>
+                          <td>{{ device.memory_usage }}</td>
+                          <td>{{ device.disk_usage }}</td>
+                          <td>{{ device.temperature }}</td>
+                          <td>{{ device.last_active_on }}</td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                </div>
+
+            </div>
+<div class="col-md-12">
+  <div class="card card-plain">
+    <div class="card-header card-header-primary">
+      <h4 class="card-title mt-0">Device Information</h4>
+      <p class="card-category">Device Healthcheck Information</p>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Lat</th>
+              <th>Long</th>
+              <th>Area Code</th>
+              <th>Confidence</th>
+              <th>Device ID</th>
+              <th>Traced On</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for leopard in leopards %}
+            <tr>
+              <td>{{ leopard.type }}</td>
+              <td>{{ leopard.lat }}</td>
+              <td>{{ leopard.long }}</td>
+              <td>{{ leopard.area_code }}</td>
+              <td>{{ leopard.confidence }}</td>
+              <td>{{ leopard.device_id }}</td>
+              <td>{{ leopard.traced_on }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination controls -->
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          {% if leopards.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1" aria-label="First">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ leopards.previous_page_number }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          {% endif %}
+
+          {% for page_num in leopards.paginator.page_range %}
+            <li class="page-item {% if leopards.number == page_num %}active{% endif %}">
+              <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+            </li>
+          {% endfor %}
+
+          {% if leopards.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ leopards.next_page_number }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ leopards.paginator.num_pages }}" aria-label="Last">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <script>
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      md.initDashboardPageCharts();
+
+    });
+  </script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {
+        'packages':['geochart'],
+      });
+      google.charts.setOnLoadCallback(drawRegionsMap);
+
+      function drawRegionsMap() {
+        var data = google.visualization.arrayToDataTable([
+          ['Lat', 'Long', 'Area Code'],
+          {% for leopard in leopards %}
+            [{{ leopard.lat }}, {{ leopard.long }}, '{{ leopard.area_code }}'],
+          {% endfor %}
+        ]);
+
+        var options = {
+          region: 'IN',  // ISO code for India
+          displayMode: 'markers',
+          resolution: 'provinces',  // Zoom into country level
+          colorAxis: {colors: ['red', 'red']},  // Example color gradient
+<!--          datalessRegionColor: '#43a047',-->
+        };
+
+        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+
+        chart.draw(data, options);
+      }
+    </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+        // Parse the DataFrame JSON data from Django context
+        const leopardData = JSON.parse('{{ leopard_df_json|escapejs }}');
+
+        // Process the DataFrame to get chart data
+        const labels = leopardData.map(row => row['area_code']); // Customize this based on your data
+        const data = leopardData.map(row => row['occurrence_count']); // Customize this based on your data
+
+        // Get the canvas element
+        const canvas = document.getElementById('lineChart');
+        const ctx = canvas.getContext('2d');
+
+        // Set the canvas width and height dynamically
+        canvas.width = canvas.parentElement.clientWidth; // 100% of its container's width
+        canvas.height = 400;  // You can set this dynamically too
+
+        // If you want to use inline styles
+        canvas.style.width = '100%';
+        canvas.style.height = 'auto'; // Maintain aspect ratio if needed
+
+        // Initialize the chart
+        const lineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels, // Use labels derived from DataFrame
+                datasets: [{
+                    label: 'Area Code Data',
+                    data: data, // Use data derived from DataFrame
+                    borderColor: 'white',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    pointBackgroundColor: 'white',
+                    pointBorderColor: 'white',
+                    fill: true,
+                    tension: 0.4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Important for the canvas to scale properly
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: Math.max(...data) + 10, // Adjust max value based on your data
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.3)',
+                        },
+                        ticks: {
+                            color: 'white',
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.3)',
+                        },
+                        ticks: {
+                            color: 'white',
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock javascripts %}
