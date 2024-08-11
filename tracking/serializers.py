@@ -5,7 +5,7 @@ from traces.models import Device, LeopardTraces
 class DeviceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device
-        fields = ['device_id', 'device_name']
+        fields = ['device_id', 'device_name', 'last_active_on']
 
 class DeviceHealthCheckSerializer(serializers.Serializer):
     device_id = serializers.CharField(max_length=100)
