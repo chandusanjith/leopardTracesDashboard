@@ -127,6 +127,7 @@
               <th>Confidence</th>
               <th>Device ID</th>
               <th>Traced On</th>
+              <th>Actions</th> <!-- New column for the button -->
             </tr>
           </thead>
           <tbody>
@@ -137,13 +138,19 @@
               <td>{{ leopard.long }}</td>
               <td>{{ leopard.area_code }}</td>
               <td>{{ leopard.confidence }}</td>
-              <td>{{ leopard.device_id }}</td>
+              <td>{{ leopard.device.device_id }}</td> <!-- Assuming device has device_id field -->
               <td>{{ leopard.traced_on }}</td>
+              <td>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#imageModal-{{ leopard.id }}">
+                  View Image
+                </button>
+              </td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
+    </div>
 
       <!-- Pagination controls -->
       <nav aria-label="Page navigation">
@@ -230,6 +237,31 @@
 
             </div>
 </div>
+                  {% for leopard in leopards %}
+<div class="modal fade" id="imageModal-{{ leopard.id }}" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel-{{ leopard.id }}" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel-{{ leopard.id }}">Leopard Image</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% if leopard.image %}
+          <img src="{{ leopard.image.url }}" alt="Leopard Image" class="img-fluid">
+        {% else %}
+          <p>No image available.</p>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
 
 {% endblock content %}
 

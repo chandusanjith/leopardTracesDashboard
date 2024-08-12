@@ -41,7 +41,10 @@ def device_health_check(request):
 
 @api_view(['POST'])
 def add_leopard_trace(request):
-    serializer = LeopardTracesSerializer(data=request.data)
+    # Include both data and files in the serializer
+    data = request.data.copy()  # Create a mutable copy of the request data
+    data.update(request.FILES)  # Add files to the data dictionary
+    serializer = LeopardTracesSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -21,6 +21,7 @@ class LeopardTraces(models.Model):
     device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='leopard_traces', null=True, blank=True)
     traced_on = models.DateTimeField()
     viewed = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='leopard_images/', null=True, blank=True)  # New image field
 
     def __str__(self):
         return "{}-{}".format(self.lat, self.area_code)
