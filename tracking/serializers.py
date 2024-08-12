@@ -5,7 +5,7 @@ from traces.models import Device, LeopardTraces
 class DeviceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device
-        fields = ['device_id', 'device_name', 'last_active_on']
+        fields = ['device_id', 'device_name', "last_active_on"]
 
 class DeviceHealthCheckSerializer(serializers.Serializer):
     device_id = serializers.CharField(max_length=100)
@@ -18,7 +18,7 @@ class DeviceHealthCheckSerializer(serializers.Serializer):
 class LeopardTracesSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeopardTraces
-        fields = ['type','lat', 'long', 'area_code', 'confidence', 'device', 'traced_on']
+        fields = "__all__"
 
     def validate_device(self, value):
         if not Device.objects.filter(id=value.id).exists():
