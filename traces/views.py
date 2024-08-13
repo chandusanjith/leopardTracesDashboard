@@ -9,7 +9,7 @@ from django.http import JsonResponse
 
 # Create your views here.
 def LoadPage(request):
-    leopard_traces = LeopardTraces.objects.all()
+    leopard_traces = LeopardTraces.objects.all().order_by('-id')
     data = list(leopard_traces.values())
     context = {}
 
