@@ -21,6 +21,7 @@ def LoadPage(request):
 
     # Create a DataFrame from the list of dictionaries
     leopard_df = pd.DataFrame(data)
+    leopard_df['traced_on'] = pd.to_datetime(leopard_df['traced_on']).dt.date
     df = leopard_df.groupby(['type', 'area_code', 'lat', 'long', 'traced_on']).size().reset_index(name='occurrence_count')
     df['traced_on'] = pd.to_datetime(df['traced_on']).dt.date
 
