@@ -21,7 +21,8 @@ def LoadPage(request):
 
     # Create a DataFrame from the list of dictionaries
     leopard_df = pd.DataFrame(data)
-    df = leopard_df.groupby(['type', 'area_code', 'lat', 'long']).size().reset_index(name='occurrence_count')
+    df = leopard_df.groupby(['type', 'area_code', 'lat', 'long', 'traced_on']).size().reset_index(name='occurrence_count')
+    df['traced_on'] = pd.to_datetime(df['traced_on']).dt.date
 
     # Create the bubble map
     fig = px.scatter_geo(df,
@@ -33,8 +34,9 @@ def LoadPage(request):
                          # title='Bubble Map of Maharashtra Cities',
                          center={'lat': 19.7515, 'lon': 75.7139},  # Center on Maharashtra
                          size_max=50,  # Maximum size of bubbles
-                         height= 420
-                         )
+                         height= 800,
+                         animation_frame = "traced_on",
+                         projection="natural earth")
 
     # Update layout for a better map visualization
     fig.update_geos(
@@ -51,12 +53,32 @@ def LoadPage(request):
 
     fig.update_layout(
         title=dict(x=0.5),  # Center title
-        geo=dict(projection_scale=5)  # Zoom level
+        geo=dict(projection_scale=5),  # Zoom level
+        width=1400,  # Default width in pixels
     )
 
     div = opy.plot(fig, auto_open=False, output_type='div')
-    leopard_df = leopard_df.groupby(['type', 'area_code']).size().reset_index(name='occurrence_count')
-    context['leopard_df_json'] = leopard_df.to_json(orient='records')
+    leopard_df_json = leopard_df.groupby(['type', 'area_code']).size().reset_index(name='occurrence_count')
+    context['leopard_df_json'] = leopard_df_json.to_json(orient='records')
+    # Assume leopard_df is your DataFrame with columns: 'type', 'area_code', 'traced_on'
+    # Assume leopard_df is your DataFrame with columns: 'type', 'area_code', 'traced_on'
+    leopard_df['traced_on'] = pd.to_datetime(leopard_df['traced_on'])
+
+    # Convert 'traced_on' to timezone-naive (remove the timezone information)
+    leopard_df['traced_on'] = leopard_df['traced_on'].dt.tz_localize(None)
+
+    # Filter the last 7 days using timezone-naive comparison
+    last_7_days = pd.Timestamp('now').normalize() - pd.Timedelta(days=7)
+    filtered_df = leopard_df[leopard_df['traced_on'] >= last_7_days]
+    # print(filtered_df['traced_on'].to_dict())
+    # Group by 'type', 'area_code', and 'traced_on' (keeping only the date part of 'traced_on')
+    # filtered_df['traced_on'] = filtered_df['traced_on'].dt.date
+    grouped_df = filtered_df.groupby(['type', 'area_code', 'traced_on']).size().reset_index(name='occurrence_count')
+    # print(grouped_df.to_json(orient='records'))
+
+    # Convert to JSON with 'records' orientation
+    context['leopard_df_days_json'] = grouped_df.to_json(orient='records')
+
 
     context['graph'] = div
 

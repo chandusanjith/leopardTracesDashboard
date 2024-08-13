@@ -71,6 +71,7 @@
         </div>
       </div>
     </div>
+
 <div class="row">
     <!-- Card 1 -->
     <div class="col-md-6">
@@ -91,18 +92,39 @@
         </div>
     </div>
 
-    <!-- Map inside a card -->
     <div class="col-md-6">
-        <div class="card card-chart" style="height: 450px;"> <!-- Adjust height accordingly -->
+      <div class="card card-chart" style="height: 450px;"> <!-- Increased heightgggggggggggggg -->
+          <div class="card-header card-header-success" style="height: 350px;">
+              <canvas id="multiLineChart" style="width: 100% !important;"></canvas>
+          </div>
+          <div class="card-body">
+              <h4 class="card-title">Number of leopards detected by area</h4>
+              <p class="card-category">
+<!--                    <span class="text-success"><i class="fa fa-long-arrow-up"></i> 55% </span> increase in today sales.</p>-->
+          </div>
+          <div class="card-footer">
+              <div class="stats">
+                  <i class="material-icons">access_time</i> updated just now
+              </div>
+          </div>
+      </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <!-- Map inside a card -->
+    <div class="col-md-12">
+        <div class="card card-chart" style="height: 850px;"> <!-- Adjust height accordingly -->
             <div class="card-body">
                 <div> <!-- Map fills the card -->
-                    <div id="regions_div" style="height: 450px;">{{graph|safe}}</div>
+                    <div id="regions_div" style="height: 800px;">{{graph|safe}}</div>
                 </div>
             </div>
             <div class="card-footer">
             </div>
         </div>
-    </div>
+    </div> 
 </div>
 
 
@@ -120,26 +142,22 @@
         <table class="table table-hover">
           <thead>
             <tr>
-              <th>Type</th>
-              <th>Lat</th>
-              <th>Long</th>
-              <th>Area Code</th>
-              <th>Confidence</th>
-              <th>Device ID</th>
-              <th>Traced On</th>
-              <th>Actions</th> <!-- New column for the button -->
+              
+              
+              <th><b>Traced On</b></th>
+              <th><b>Area Code</b></th>
+              <th><b>Latitude</b></th>
+              <th><b>Longitude</b></th>
+              <th><b>Actions</b></th> 
             </tr>
           </thead>
           <tbody>
             {% for leopard in leopards %}
             <tr>
-              <td>{{ leopard.type }}</td>
+              <td>{{ leopard.traced_on }}</td>
+              <td>{{ leopard.area_code }}</td>
               <td>{{ leopard.lat }}</td>
               <td>{{ leopard.long }}</td>
-              <td>{{ leopard.area_code }}</td>
-              <td>{{ leopard.confidence }}</td>
-              <td>{{ leopard.device.device_id }}</td> <!-- Assuming device has device_id field -->
-              <td>{{ leopard.traced_on }}</td>
               <td>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#imageModal-{{ leopard.id }}">
                   View Image
@@ -190,7 +208,7 @@
       </nav>
     </div>
   </div>
-    <div class="col-md-12">
+    <!-- <div class="col-md-12">
               <div class="card">
                 <div class="card-header card-header-primary" style="background-color: rgba(255, 255, 255, 0.3) !important; color: #000;">
                   <h4 class="card-title ">Device Information</h4>
@@ -233,11 +251,10 @@
                       {% endfor %}
                       </tbody>
                     </table>
-                </div>
+                </div> -->
 
-            </div>
 </div>
-                  {% for leopard in leopards %}
+  {% for leopard in leopards %}
 <div class="modal fade" id="imageModal-{{ leopard.id }}" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel-{{ leopard.id }}" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -278,70 +295,174 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-        // Parse the DataFrame JSON data from Django context
-        const leopardData = JSON.parse('{{ leopard_df_json|escapejs }}');
+  // Parse the DataFrame JSON data from Django context
+  const leopardData = JSON.parse('{{ leopard_df_json|escapejs }}');
 
-        // Process the DataFrame to get chart data
-        const labels = leopardData.map(row => row['area_code']); // Customize this based on your data
-        const data = leopardData.map(row => row['occurrence_count']); // Customize this based on your data
+  // Process the DataFrame to get chart data
+  const labels = leopardData.map(row => row['area_code']); // Customize this based on your data
+  const data = leopardData.map(row => row['occurrence_count']); // Customize this based on your data
 
-        // Get the canvas element
-        const canvas = document.getElementById('lineChart');
-        const ctx = canvas.getContext('2d');
+  // Get the canvas element
+  const canvas = document.getElementById('lineChart'); // Assuming the ID stays the same
+  const ctx = canvas.getContext('2d');
 
-        // Set the canvas width and height dynamically
-        canvas.width = canvas.parentElement.clientWidth; // 100% of its container's width
-        canvas.height = 400;  // You can set this dynamically too
+  // Set the canvas width and height dynamically
+  canvas.width = canvas.parentElement.clientWidth; // 100% of its container's width
+  canvas.height = 400;  // You can set this dynamically too
 
-        // If you want to use inline styles
-        canvas.style.width = '100%';
-        canvas.style.height = 'auto'; // Maintain aspect ratio if needed
+  // If you want to use inline styles
+  canvas.style.width = '100%';
+  canvas.style.height = 'auto'; // Maintain aspect ratio if needed
 
-        // Initialize the chart
-        const lineChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels, // Use labels derived from DataFrame
-                datasets: [{
-                    label: 'Area Code Data',
-                    data: data, // Use data derived from DataFrame
-                    borderColor: 'white',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    pointBackgroundColor: 'white',
-                    pointBorderColor: 'white',
-                    fill: true,
-                    tension: 0.4,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false, // Important for the canvas to scale properly
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: Math.max(...data) + 10, // Adjust max value based on your data
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.3)',
-                        },
-                        ticks: {
-                            color: 'white',
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.3)',
-                        },
-                        ticks: {
-                            color: 'white',
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                }
-            }
-        });
-    </script>
+  // Initialize the chart as a bar chart
+  const barChart = new Chart(ctx, {
+      type: 'bar', // Changed from 'line' to 'bar'
+      data: {
+          labels: labels, // Use labels derived from DataFrame
+          datasets: [{
+              label: 'Area Code Data',
+              data: data, // Use data derived from DataFrame
+              borderColor: 'rgba(255, 255, 255, 0.8)',
+              backgroundColor: 'rgba(255, 255, 255, 0.5)', // Bar color with some transparency
+              borderWidth: 1 // Border width for bars
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false, // Important for the canvas to scale properly
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  max: Math.max(...data) + 10, // Adjust max value based on your data
+                  grid: {
+                      color: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  ticks: {
+                      color: 'white',
+                  }
+              },
+              x: {
+                  grid: {
+                      color: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  ticks: {
+                      color: 'white',
+                  }
+              }
+          },
+          plugins: {
+              legend: {
+                  display: false,
+              }
+          }
+      }
+  });
+</script>
+
+
+<script>
+  // Parse the DataFrame JSON data from Django context
+  const leopardDataDaily = JSON.parse('{{ leopard_df_days_json|escapejs }}');
+
+  // Convert timestamps to date strings in YYYY-MM-DD format
+  leopardDataDaily.forEach(row => {
+      const timestamp = row['traced_on'];
+      // Check if the timestamp is valid
+      if (isNaN(timestamp) || timestamp <= 0) {
+          console.error(`Invalid timestamp: ${timestamp}`);
+          return;
+      }
+      // Convert timestamp to Date object and format it as YYYY-MM-DD
+      const date = new Date(timestamp);
+      row['traced_on'] = date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
+  });
+
+  // Group data by area_code and days (traced_on)
+  const groupedData = {};
+  leopardDataDaily.forEach(row => {
+      const { area_code, traced_on, occurrence_count } = row;
+      if (!groupedData[area_code]) {
+          groupedData[area_code] = { days: [], occurrences: [] };
+      }
+      groupedData[area_code].days.push(traced_on);
+      groupedData[area_code].occurrences.push(occurrence_count);
+  });
+  console.log('Grouped Data:', groupedData);
+
+  // Get unique days for the x-axis and sort them
+  const allDays = [...new Set(leopardDataDaily.map(row => row['traced_on']))].sort((a, b) => new Date(a) - new Date(b));
+  console.log('allDays:', allDays);
+
+  // Prepare datasets for each area_code
+  const datasets = Object.keys(groupedData).map((area_code, index) => {
+      const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange']; // Customize colors as needed
+      return {
+          label: area_code,
+          data: allDays.map(day => {
+              const idx = groupedData[area_code].days.indexOf(day);
+              return idx !== -1 ? groupedData[area_code].occurrences[idx] : 0;
+          }),
+          borderColor: colors[index % colors.length],
+          backgroundColor: colors[index % colors.length],
+          fill: false,
+          tension: 0.4,
+          pointBackgroundColor: colors[index % colors.length],
+          pointBorderColor: colors[index % colors.length]
+      };
+  });
+
+  // Get the canvas element
+  const canvasDaily = document.getElementById('multiLineChart');
+  const ctxDaily = canvasDaily.getContext('2d');
+
+  // Set the canvas width and height dynamically
+  canvasDaily.width = canvasDaily.parentElement.clientWidth;
+  canvasDaily.height = 400;
+
+  // Initialize the chart with multiple lines
+  const multiLineChart = new Chart(ctxDaily, {
+      type: 'line',
+      data: {
+          labels: allDays,
+          datasets: datasets
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  grid: {
+                      color: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  ticks: {
+                      color: 'white',
+                  }
+              },
+              x: {
+                  grid: {
+                      color: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  ticks: {
+                      color: 'white',
+                  }
+              }
+          },
+          plugins: {
+              legend: {
+                  display: true,
+                  labels: {
+                      color: 'white'
+                  }
+              }
+          }
+      }
+  });
+</script>
+
+
+
+
+
+
 {% endblock javascripts %}
