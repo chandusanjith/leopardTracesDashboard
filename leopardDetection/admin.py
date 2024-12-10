@@ -1,5 +1,5 @@
 from django.contrib import admin
-from traces.models import LeopardTraces, Device
+from traces.models import LeopardTraces, Device, Forest
 
 from django.apps import apps
 
@@ -15,6 +15,9 @@ class LeopardTracesAdmin(DynamicModelAdmin):
 class DeviceAdmin(DynamicModelAdmin):
     pass
 
+class ForestAdmin(DynamicModelAdmin):
+    pass
 # Assuming your app is named 'myapp'
 admin.site.register(apps.get_model('traces', 'LeopardTraces'), LeopardTracesAdmin)
 admin.site.register(apps.get_model('traces', 'Device'), DeviceAdmin)
+admin.site.register(apps.get_model('traces', 'Forest'), ForestAdmin)

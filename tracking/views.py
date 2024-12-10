@@ -8,12 +8,11 @@ from .serializers import *
 
 @api_view(['POST'])
 def add_device(request):
-    if request.method == 'POST':
-        serializer = DeviceSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer = DeviceSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -26,6 +25,8 @@ def device_health_check(request):
         memory_usage = serializer.validated_data['memory_usage']
         disk_usage = serializer.validated_data['disk_usage']
         temperature = serializer.validated_data['temperature']
+        forest = serializer.validated_data['forest_id']
+
         try:
             device = Device.objects.get(device_id=device_id)
             device.last_active_on = created_at
@@ -33,6 +34,7 @@ def device_health_check(request):
             device.memory_usage = memory_usage
             device.disk_usage = disk_usage
             device.temperature = temperature
+            device.forest = forest  # Update forest
             device.save()
             return Response({'status': 'success', 'message': 'Device health check updated.'}, status=status.HTTP_200_OK)
         except Device.DoesNotExist:
@@ -44,8 +46,18 @@ def add_leopard_trace(request):
     # Include both data and files in the serializer
     data = request.data.copy()  # Create a mutable copy of the request data
     data.update(request.FILES)  # Add files to the data dictionary
+
+    # Validate the forest_id in the request
+    forest_id = data.get("forest")
+    if not Forest.objects.filter(forest_id=forest_id).exists():
+        return Response(
+            {"error": "Forest with the provided ID does not exist."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     serializer = LeopardTracesSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
